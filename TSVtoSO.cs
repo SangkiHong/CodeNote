@@ -1,4 +1,5 @@
 // Description
+// Date: 23/01/11
 // Converse TextAsset(.tsv) to ScriptableObject.
 // Code source: https://blog.unity.com/technology/advanced-editor-scripting-hacks-to-save-you-time-part-2
 
