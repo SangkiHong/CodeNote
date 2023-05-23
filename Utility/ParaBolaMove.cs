@@ -3,13 +3,13 @@ using UnityEngine;
 
 public class ParaBolaMove : MonoBehaviour
 {
-    public float height;
-    public float power;
+    public float height = 12f;
+    public float power = 1f;
 
-    public float speed;
-    public float dropSpeed;
+    public float speed = 1.2f;
+    public float dropSpeed = 20f;
 
-    private float _timer = 0;
+    private float _timer;
 
     private Coroutine _coroutine;
 
