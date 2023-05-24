@@ -9,7 +9,8 @@ public class ParaBolaMove : MonoBehaviour
     public float speed = 1.2f;
     public float dropSpeed = 20f;
 
-    private float _timer;
+    private float _progress;
+    public float heightvalue;
 
     private Coroutine _coroutine;
 
@@ -20,22 +21,22 @@ public class ParaBolaMove : MonoBehaviour
 
     private IEnumerator MoveCoroutine(Vector3 startPos, Vector3 destPos)
     {
-        _timer = 0;
+        _progress = 0;
 
         Transform _transform = transform;
 
         while (true)
         {
             // 포물선 이동
-            if (_timer < 0.9f) 
+            if (_progress < 0.9f) 
             {
-                _timer += speed * Time.deltaTime;
+                _progress += speed * Time.deltaTime;
 
-                Vector3 MovePos = MoveParaBola(startPos, destPos, _timer);
+                Vector3 MovePos = MoveParaBola(startPos, destPos, _progress);
 
                 _transform.position = MovePos;
 
-                Vector3 nextPos = MoveParaBola(startPos, destPos, _timer + 0.01f);
+                Vector3 nextPos = MoveParaBola(startPos, destPos, _progress + 0.01f);
                 Vector3 forwardDir = (nextPos - MovePos).normalized;
 
                 _transform.rotation = Quaternion.LookRotation(forwardDir, Vector3.up); 
@@ -57,7 +58,7 @@ public class ParaBolaMove : MonoBehaviour
 
     private Vector3 MoveParaBola(Vector3 _start, Vector3 _end, float _time)
     {
-        float heightvalue = -power * height * _time * _time + power * height * _time;
+        heightvalue = (power * height * _time) - (power * height * _time * _time);
 
         Vector3 pos = Vector3.Lerp(_start, _end, _time);
         pos.y += heightvalue;
