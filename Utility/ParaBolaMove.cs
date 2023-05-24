@@ -8,6 +8,7 @@ public class ParaBolaMove : MonoBehaviour
 
     public float speed = 1.2f;
     public float dropSpeed = 20f;
+    public float dropLerp = 0.03f;
 
     private Coroutine _coroutine;
 
@@ -42,7 +43,7 @@ public class ParaBolaMove : MonoBehaviour
             else 
             {
                 Vector3 targetRot = _transform.rotation.eulerAngles;
-                targetRot.x = Mathf.Lerp(targetRot.x, 90f, 0.05f);
+                targetRot.x = Mathf.Lerp(targetRot.x, 90f, dropLerp);
 
                 Vector3 movePos = _transform.position + (dropSpeed * Time.deltaTime * _transform.forward);
 
