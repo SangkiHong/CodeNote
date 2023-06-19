@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.AI;
 using DG.Tweening;
@@ -56,6 +56,21 @@ namespace HSK.Util
             }
 
             yield return null;
+        }
+
+        public T FindInParentRecursive<T>(Transform target)
+        {
+            T findTarget;
+
+            findTarget = target.GetComponent<T>();
+
+            while (findTarget == null && target.parent != null) 
+            {
+                target = target.parent;
+                findTarget = target.GetComponent<T>();
+            }
+
+            return findTarget;
         }
     }
 
