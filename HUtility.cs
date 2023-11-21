@@ -58,6 +58,49 @@ namespace HSK.Util
             yield return null;
         }
 
+        public IEnumerator CheckAnimationPlay(Animator animator, Action onCheckAnimState = null, Action onEndCallback = null)
+        {
+            yield return new WaitForSeconds(0.5f);
+
+            // 평균 NormalizedTime 증가값
+            float averageIncreaseValue = 0;
+
+            // 직전 프레임의 NormalizedTime 값
+            float beforeNormalizedTime = 0;
+
+            while (animator.GetCurrentAnimatorStateInfo(0).normalizedTime < 1) 
+            {
+                float normalizedTime = animator.GetCurrentAnimatorStateInfo(0).normalizedTime;
+
+                // HSK::230619_normalizedTime이 0.9이상 일 때부터 평균 값을 체크
+                if (normalizedTime > 0.9f) 
+                {
+                    if (beforeNormalizedTime > 0) 
+                    {
+                        float increaseValue = normalizedTime - beforeNormalizedTime;
+
+                        if (averageIncreaseValue > 0)
+                            averageIncreaseValue = (averageIncreaseValue + increaseValue) / 2;
+                        else
+                            averageIncreaseValue = increaseValue;
+                    }
+
+                    beforeNormalizedTime = normalizedTime;
+
+                    onCheckAnimState?.Invoke();
+
+                    // 다음 애니메이션으로 넘어가는 경우(normalizedTime의 값이 1에 매우 근접한 경우)
+                    if (0.998f < normalizedTime + averageIncreaseValue)
+                        break;
+                }
+
+                yield return null;
+            }
+
+            onEndCallback?.Invoke();
+        }
+    }
+
         public T FindInParentRecursive<T>(Transform target)
         {
             T findTarget;
