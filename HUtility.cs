@@ -99,7 +99,6 @@ namespace HSK.Util
 
             onEndCallback?.Invoke();
         }
-    }
 
         public T FindInParentRecursive<T>(Transform target)
         {
