@@ -1,0 +1,25 @@
+private IEnumerator MoveCircle()
+{
+    float elapsed = 0f;  // 경과 시간
+    float duration = 1f; // 한 바퀴 회전 시간
+    float radius = 0.5f; // 반지름 길이
+    Vector3 pivotPoint = transform.position + (radius * Vector3.forward);
+
+    while (elapsed <= duration)
+    {
+        // 0 ~ 360도 러프 각도 값
+        float angle = Mathf.Lerp(0, 360, elapsed / duration);
+        // 각도를 Radian 값으로 변환
+        angle *= Mathf.Deg2Rad;
+        // 축을 중심으로 시계 반대 방향으로 이동
+        float pointX = Mathf.Sin(angle) * radius;
+        float pointZ = Mathf.Cos(angle) * -radius;
+        Vector3 lerpPoint = new Vector3(pointX, 0, pointZ);
+        Vector3 movePoint = pivotPoint + lerpPoint;
+
+        transform.position = movePoint;
+
+        elapsed += Time.deltaTime;
+        yield return null;
+    }
+}
