@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace HSK.Util
@@ -8,18 +8,16 @@ namespace HSK.Util
     {
         // 검색한 콜라이더를 임시로 저장할 버퍼 배열
         private readonly Collider[] _overlapColliders;
-
+        // 장애물 오브젝트 레이어 배열
+        private readonly int[] obstacleLayers;
         private readonly Transform _thisTransform;
 
-        private RaycastHit _hit;
-
-        private int _defualtLayer = LayerMask.NameToLayer("Default");
-
         // 생성자(현재 트랜스폼)
-        public SearchUtility(Transform _transform)
+        public SearchUtility(Transform _transform, int buffSize = 20, int[] obstacleLayers = null)
         {
             _thisTransform = _transform;
-            _overlapColliders = new Collider[20]; // 탐색된 콜라이더를 담을 콜라이더 버퍼 배열
+            _overlapColliders = new Collider[buffSize]; // 탐색된 콜라이더를 담을 콜라이더 버퍼 배열
+            this.obstacleLayers = obstacleLayers;
         }
 
         /// <summary>
@@ -36,22 +34,26 @@ namespace HSK.Util
             GameObject catchedObject = null;
 
             // Physics.OverlapSphereNonAlloc 함수를 통해 현재 트랜스폼을 기준으로 탐색 범위 안에 있으며 레이어마스크에 해당하는 콜라이더를 버퍼에 할당
-            var hitCount = Physics.OverlapSphereNonAlloc(_thisTransform.TransformPoint(positionOffset), 
+            var hitCount = Physics.OverlapSphereNonAlloc(_thisTransform.TransformPoint(positionOffset),
                     searchDist, _overlapColliders, objectMask, QueryTriggerInteraction.Ignore);
 
             // 탐색된 콜라이더 갯수가 0 이상일 경우
-            if (hitCount > 0) {
+            if (hitCount > 0)
+            {
                 // 최소 각도에 위치한 타겟을 판별하기 위한 float형 변수
                 float minAngle = Mathf.Infinity;
 
-                for (int i = 0; i < hitCount; ++i) {
+                for (int i = 0; i < hitCount; ++i)
+                {
                     // 탐색된 오브젝트와 현재 오브젝트의 각도를 저장할 float형 변수
                     float angle;
 
                     // 탐색된 오브젝트가 전방 탐색 각도(fov) 내에 있으며, 탐색 범위(searchDist) 내에 있으면 _foundObject에 할당
-                    if (SearchWithinSight(positionOffset, fov, searchDist, _overlapColliders[i].gameObject, out angle, objectMask)) {
+                    if (SearchWithinSight(positionOffset, fov, searchDist, _overlapColliders[i].gameObject, out angle, objectMask))
+                    {
                         // 탐색된 오브젝트의 각도가 최소 각도보다 작을 경우
-                        if (angle < minAngle) {
+                        if (angle < minAngle)
+                        {
                             // 최소 각도 업데이트
                             minAngle = angle;
 
@@ -75,17 +77,20 @@ namespace HSK.Util
         public void SearchTargets(Vector3 positionOffset, float fov, float searchDist, ref SortedSet<int> objectList, LayerMask objectMask)
         {
             // Physics.OverlapSphereNonAlloc 함수를 통해 현재 트랜스폼을 기준으로 탐색 범위 안에 있으며 레이어마스크에 해당하는 콜라이더를 버퍼에 할당
-            var hitCount = Physics.OverlapSphereNonAlloc(_thisTransform.TransformPoint(positionOffset), 
+            var hitCount = Physics.OverlapSphereNonAlloc(_thisTransform.TransformPoint(positionOffset),
                     searchDist, _overlapColliders, objectMask, QueryTriggerInteraction.Ignore);
 
             // 탐색된 콜라이더 갯수가 0 이상일 경우
-            if (hitCount > 0) {
-                for (int i = 0; i < hitCount; ++i) {
+            if (hitCount > 0)
+            {
+                for (int i = 0; i < hitCount; ++i)
+                {
                     // 탐색된 오브젝트와 현재 오브젝트의 각도
                     float angle = 0;
 
                     // 탐색된 오브젝트가 전방 탐색 각도(fov) 내에 있으며, 시야 탐색 범위(searchDist) 내에 있으면 _foundObject에 할당
-                    if (SearchWithinSight(positionOffset, fov, searchDist, _overlapColliders[i].gameObject, out angle, objectMask)) {
+                    if (SearchWithinSight(positionOffset, fov, searchDist, _overlapColliders[i].gameObject, out angle, objectMask))
+                    {
                         // 리스트 내에 동일한 오브젝트가 없으면 리스트에 오브젝트를 추가
                         objectList.Add(_overlapColliders[i].gameObject.GetInstanceID());
                     }
@@ -106,7 +111,8 @@ namespace HSK.Util
         private bool SearchWithinSight(Vector3 positionOffset, float fov, float searchDist, GameObject target, out float angle, int objectMask)
         {
             // 타겟 오브젝트 null 체크
-            if (target == null) {
+            if (target == null)
+            {
                 angle = 0;
                 return false;
             }
@@ -121,26 +127,34 @@ namespace HSK.Util
             angle = Vector3.Angle(dir, _thisTransform.forward);
 
             // 탐색 가능 거리 안에 있으며, 시야 범위 내에 오브젝트가 위치하고 있는 경우
-            if (dir.magnitude < searchDist && angle < fov * 0.5f) {
-                if (LineOfSight(positionOffset, target, objectMask))
-                    return true;
+            if (dir.magnitude < searchDist && angle < fov * 0.5f && LineOfSight(positionOffset, target, objectMask))
+            {
+                return true;
             }
 
             return false;
         }
 
         // 현재 오브젝트와 타겟 오브젝트 사이에 다른 충돌 검사
-        private bool LineOfSight(Vector3 positionOffset, GameObject targetObject, int objectMask)
+        private bool LineOfSight(Vector3 positionOffset, GameObject targetObject, int lineMask)
         {
-            // 일반 오브젝트 레이어 마스크에 추가
-            objectMask |= (1 << _defualtLayer);
+            // 장애물 오브젝트 레이어 마스크에 추가
+            if (obstacleLayers != null && obstacleLayers.Length > 0)
+            {
+                for (int i = 0; i < obstacleLayers.Length; i++)
+                    lineMask |= (1 << obstacleLayers[i]);
+            }
 
-            Vector3 targetPosition = targetObject.transform.position;
-            targetPosition.y = _thisTransform.position.y + positionOffset.y;
-
-            if (Physics.Linecast(_thisTransform.TransformPoint(positionOffset), targetPosition, out _hit, objectMask, QueryTriggerInteraction.Ignore)) {
-                if (_hit.transform == targetObject.transform || _hit.transform.IsChildOf(targetObject.transform)
-                    || targetObject.transform.IsChildOf(_hit.transform))
+            Vector3 targetPoint = targetObject.transform.position;
+            targetPoint.y = _thisTransform.position.y + positionOffset.y;
+            
+            Vector3 startPoint = _thisTransform.TransformPoint(positionOffset);
+            
+            if (Physics.Linecast(startPoint, targetPoint, out RaycastHit hit, lineMask, QueryTriggerInteraction.Ignore))
+            {
+                if (hit.transform == targetObject.transform || 
+                    hit.transform.IsChildOf(targetObject.transform) ||
+                    targetObject.transform.IsChildOf(hit.transform))
                     return true;
             }
 
