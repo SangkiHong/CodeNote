@@ -1,75 +1,48 @@
+using UnityEngine;
 
-public int maxResolutionX = 1024;
-public int maxResolutionY = 1024;
-
-IEnumerator GetTexture(string path)
+public static class HUtility
 {
-    if (string.IsNullOrEmpty(path))
+    public static int maxResolutionX = 1024;
+    public static int maxResolutionY = 1024;
+
+    // Ref URL: https://discussions.unity.com/t/limit-www-texture-file-size/99343/2
+    public static Texture2D ResizeTexture(Texture2D targetTexture)
     {
-        Debug.LogError($"SetImage::Path Error - path : {path}");
-        yield break;
-    }
+        Texture2D resizeTexture = targetTexture;
 
-    using (UnityWebRequest uwr = UnityWebRequestTexture.GetTexture(path))
-    {
-        yield return uwr.SendWebRequest();
-
-        Texture2D newTexture;
-
-        if (uwr.result != UnityWebRequest.Result.Success)
+        if (targetTexture.width > maxResolutionX || targetTexture.height > maxResolutionY)
         {
-            Debug.LogError($"SetImage::Error - path: {path}, " + uwr.error);
+            float widthRatio = (float)maxResolutionX / targetTexture.width;
+            float heightRatio = (float)maxResolutionY / targetTexture.height;
 
-            newTexture = defaultTexture;
-        }
-        else
-        {
-            newTexture = DownloadHandlerTexture.GetContent(uwr);
-
-            // Limit TextureSize & Resize
-            // Ref URL: https://discussions.unity.com/t/limit-www-texture-file-size/99343/2
-#if UNITY_EDITOR
-            //Debug.Log($"Width: {newTexture.width}, Height: {newTexture.height}");
-#endif
-            // resize the newTexture to fit in the desired bounds
-            if (newTexture.width > maxResolutionX || newTexture.height > maxResolutionY)
+            if (widthRatio < heightRatio)
             {
-                float widthRatio = (float)maxResolutionX / newTexture.width;
-                float heightRatio = (float)maxResolutionY / newTexture.height;
-                if (widthRatio < heightRatio)
-                {
-                    newTexture = Resize(newTexture, (int)(newTexture.width * widthRatio), (int)(newTexture.height * widthRatio));
-                }
-                else
-                {
-                    newTexture = Resize(newTexture, (int)(newTexture.width * heightRatio), (int)(newTexture.height * heightRatio));
-                }
+                resizeTexture = Resize(targetTexture, (int)(targetTexture.width * widthRatio), (int)(targetTexture.height * widthRatio));
+            }
+            else
+            {
+                resizeTexture = Resize(targetTexture, (int)(targetTexture.width * heightRatio), (int)(targetTexture.height * heightRatio));
             }
         }
 
-        uwr.Dispose();
+        return resizeTexture;
     }
-}
 
-// returns a texture resized to the given dimensions
-public Texture2D Resize(Texture2D source, int width, int height)
-{
-    // initialize render texture with target width and height
-    RenderTexture rt = new RenderTexture(width, height, 32);
-    // set as the active render texture
-    RenderTexture.active = rt;
-    // render source texture to the render texture
-    GL.PushMatrix();
-    GL.LoadPixelMatrix(0, width, height, 0);
-    Graphics.DrawTexture(new Rect(0, 0, width, height), source);
-    GL.PopMatrix();
-    // initialize destination texture with target width and height
-    Texture2D dest = new Texture2D(width, height);
-    // copy render texture to the destination texture
-    dest.ReadPixels(new Rect(0, 0, width, height), 0, 0);
-    dest.Apply();
-    // resume rendering to the main window
-    RenderTexture.active = null;
-    DestroyImmediate(source, true);
-    return dest;
+    private static Texture2D Resize(Texture2D source, int width, int height)
+    {
+        RenderTexture rt = new RenderTexture(width, height, 32);
+        RenderTexture.active = rt;
+
+        GL.PushMatrix();
+        GL.LoadPixelMatrix(0, width, height, 0);
+        Graphics.DrawTexture(new Rect(0, 0, width, height), source);
+        GL.PopMatrix();
+
+        Texture2D dest = new Texture2D(width, height);
+        dest.ReadPixels(new Rect(0, 0, width, height), 0, 0);
+        dest.Apply();
+
+        RenderTexture.active = null;
+        return dest;
+    }
 }
