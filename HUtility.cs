@@ -129,10 +129,15 @@ namespace HSK.Util
             randomDirection += centerPosition;
 
             // NavMesh.SamplePosition 함수를 통해 랜덤 위치에 NavMeshAgent가 이동 가능한 위치인지 판별하여 _navHit에 할당
-            NavMesh.SamplePosition(randomDirection, out NavMeshHit navHit, distance, NavMesh.AllAreas);
-
-            // _navHit에 할당된 position 값을 반환
-            return navHit.position;
+            if (NavMesh.SamplePosition(randomDirection, out NavMeshHit navHit, distance, NavMesh.AllAreas))
+            { 
+                return navHit.position; // _navHit에 할당된 position 값을 반환
+            }
+            else
+            {
+                Debug.LogError("Can't get sample position.");
+                return centerPosition;
+            }
         }
 
         // NavMeshAgent의 목적지에 대한 남은 거리를 반환(2019 버전 오류로 인한 대응 함수)
