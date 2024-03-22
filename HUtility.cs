@@ -123,13 +123,13 @@ namespace HSK.Util
         public static Vector3 GetRandomPosition(this NavMeshAgent navMeshAgent, Vector3 centerPosition, float distance)
         {
             // Random.insideUnitSphere으로 랜덤한 위치 값을 가져옴
-            Vector3 randomDirection = Random.insideUnitSphere * distance;
+            Vector3 randomPoint = Random.insideUnitSphere * distance;
 
             // 랜덤 위치 값에 순찰 시작 지점을 더하여 순찰 지점을 중심으로 랜덤 위치를 구함
-            randomDirection += centerPosition;
+            randomPoint += centerPosition;
 
             // NavMesh.SamplePosition 함수를 통해 랜덤 위치에 NavMeshAgent가 이동 가능한 위치인지 판별하여 _navHit에 할당
-            if (NavMesh.SamplePosition(randomDirection, out NavMeshHit navHit, distance, NavMesh.AllAreas))
+            if (NavMesh.SamplePosition(randomPoint, out NavMeshHit navHit, distance, NavMesh.AllAreas))
             { 
                 return navHit.position; // _navHit에 할당된 position 값을 반환
             }
