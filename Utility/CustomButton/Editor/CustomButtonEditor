@@ -1,0 +1,41 @@
+using UnityEditor;
+using UnityEditor.UI;
+
+using UnityEngine;
+
+namespace ProjectD
+{
+    [CustomEditor(typeof(CustomButton))]
+    public class CustomButtonEditor : ButtonEditor
+    {
+        public override void OnInspectorGUI()
+        {
+            base.OnInspectorGUI();
+
+            GUILayout.Space(10);
+
+            GUILayout.Box("CUSTOM BUTTON MENU", GUILayout.ExpandWidth(true));
+
+            serializedObject.Update();
+            CustomButton customButton = (CustomButton)target;
+
+            customButton.useHoldButton = EditorGUILayout.Toggle("Use Hold Button", customButton.useHoldButton);
+
+            if (customButton.useHoldButton)
+            {
+                customButton.holdDelayTime = Mathf.Max(0, EditorGUILayout.FloatField("Hold Delay Time", customButton.holdDelayTime));
+                customButton.holdActionInterval = Mathf.Max(0, EditorGUILayout.FloatField("Hold Action Interval", customButton.holdActionInterval));
+            }
+
+            customButton.syncTransitionTextsNImages = EditorGUILayout.Toggle("Sync Transition Texts & Images", customButton.syncTransitionTextsNImages);
+
+            if (customButton.syncTransitionTextsNImages)
+            {
+                EditorGUILayout.PropertyField(serializedObject.FindProperty("syncTexts"));
+                EditorGUILayout.PropertyField(serializedObject.FindProperty("syncImages"));
+            }
+
+            serializedObject.ApplyModifiedProperties();
+        }
+    }
+}
