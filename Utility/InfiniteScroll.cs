@@ -31,8 +31,6 @@ public class InfiniteScroll : MonoBehaviour
 
         switchingSize = itemTransforms[0].sizeDelta.y + verticalLayout.spacing;
         scrollRange.y = -switchingSize;
-
-        MoveTo(100);
     }
 
     private void FixedUpdate()
@@ -61,6 +59,7 @@ public class InfiniteScroll : MonoBehaviour
         }
     }
 
+    // 해당 인덱스로 즉시 이동하는 함수
     public void MoveTo(int focusIndex)
     {
         if (focusIndex > 3)
