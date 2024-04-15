@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
 
-public class ScreenShot : MonoBehaviour
+public class ScreenCapture : MonoBehaviour
 {
-    public Camera _camera;       //보여지는 카메라.
-
+    public Camera targetCamera;
     public bool size2ScreenSize;
     public int resWidth;
     public int resHeight;
-    string path;
+    
+    string _path;
 
     void Start()
     {
@@ -19,8 +19,8 @@ public class ScreenShot : MonoBehaviour
             resWidth = Screen.width;
             resHeight = Screen.height;
         }
-        path = Application.dataPath + "/ScreenShot/";
-        Debug.Log(path);
+        _path = Application.datapath + "/ScreenShot/";
+        Debug.Log(_path);
     }
 
     private void LateUpdate()
@@ -33,18 +33,18 @@ public class ScreenShot : MonoBehaviour
 
     public void ClickScreenShot()
     {
-        DirectoryInfo dir = new DirectoryInfo(path);
+        DirectoryInfo dir = new DirectoryInfo(_path);
         if (!dir.Exists)
         {
-            Directory.CreateDirectory(path);
+            Directory.CreateDirectory(_path);
         }
         string name;
-        name = path + System.DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss") + ".png";
+        name = _path + System.DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss") + ".png";
         RenderTexture rt = new RenderTexture(resWidth, resHeight, 24);
-        _camera.targetTexture = rt;
+        targetCamera.targetTexture = rt;
         Texture2D screenShot = new Texture2D(resWidth, resHeight, TextureFormat.RGB24, false);
         Rect rec = new Rect(0, 0, screenShot.width, screenShot.height);
-        _camera.Render();
+        targetCamera.Render();
         RenderTexture.active = rt;
         screenShot.ReadPixels(new Rect(0, 0, resWidth, resHeight), 0, 0);
         screenShot.Apply();
