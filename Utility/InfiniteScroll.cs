@@ -3,6 +3,8 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
+// Parent of list items has VerticalLayoutGroup and ContentSizeFitter component. Turn off both components after setting certain positions and intervals.
+// Change the MovementType in ScrollRect to Unrestricted.
 public class InfiniteScroll : MonoBehaviour
 {
     [Header("Need")]
@@ -10,12 +12,12 @@ public class InfiniteScroll : MonoBehaviour
     [SerializeField] private VerticalLayoutGroup verticalLayout;
     [SerializeField] private RectTransform[] itemTransforms;
 
-    // 순서 인덱스 관리를 위한 인덱스 리스트(Bottom -> Top 순)
+    // Index list for order index management (Bottom -> Top)
     List<int> indexList = new List<int>();
 
     private RectTransform contentTransform;
 
-    // 스크롤 감지 범위를 위한 2차원 벡터
+    // Vector2 for scroll detection range
     private Vector2 scrollRange;
     private float switchingSize;
 
@@ -59,7 +61,7 @@ public class InfiniteScroll : MonoBehaviour
         }
     }
 
-    // 해당 인덱스로 즉시 이동하는 함수
+    // Method that move immediately to the corresponding index
     public void MoveTo(int focusIndex)
     {
         if (focusIndex > 3)
