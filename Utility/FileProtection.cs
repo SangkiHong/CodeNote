@@ -4,34 +4,52 @@ using System.Security.Cryptography;
 
 public class FileProtection
 {
-  // 파일이름 암호화
-  public string MD5HashFunc(string str)
-  {
-      StringBuilder MD5Str = new StringBuilder();
-      byte[] byteArr = Encoding.ASCII.GetBytes(str);
-      byte[] resultArr = (new MD5CryptoServiceProvider()).ComputeHash(byteArr);
-  
-      for (int cnti = 0; cnti < resultArr.Length; cnti++)
-      {
-          MD5Str.Append(resultArr[cnti].ToString("X2"));
-      }
+    // Encrypting file name
+    public string MD5HashFunc(string str)
+    {
+        StringBuilder MD5Str = new StringBuilder();
+        byte[] byteArr = Encoding.ASCII.GetBytes(str);
+        byte[] resultArr = (new MD5CryptoServiceProvider()).ComputeHash(byteArr);
     
-      return MD5Str.ToString();
-  }
+        for (int cnti = 0; cnti < resultArr.Length; cnti++)
+        {
+            MD5Str.Append(resultArr[cnti].ToString("X2"));
+        }
+      
+        return MD5Str.ToString();
+    }
+    
+    // Encryption
+    public byte[] AESEncrypt256(byte[] encryptData, String password)
+    {
+        AESEncrypt aes = new AESEncrypt();
+        return aes.AESEncrypt256(encryptData, password);
+    }
+    
+    // Decryption
+    public byte[] AESDecrypt256(byte[] decryptData, String password)
+    {
+        AESEncrypt aes = new AESEncrypt();
+        return aes.AESDecrypt256(decryptData, password);
+    }
   
-  // 암호화
-  public byte[] AESEncrypt256(byte[] encryptData, String password)
-  {
-      AESEncrypt aes = new AESEncrypt();
-      return aes.AESEncrypt256(encryptData, password);
-  }
   
-  // 복호화
-  public byte[] AESDecrypt256(byte[] decryptData, String password)
-  {
-      AESEncrypt aes = new AESEncrypt();
-      return aes.AESDecrypt256(decryptData, password);
-  }
+    // Example Using
+    public void Save(string path, string saltKey, Data data)
+    {
+        string jsonData = JsonConvert.SerializeObject(data);
+      
+        if (useEncrypt)
+        {
+            byte[] byteData = Encoding.UTF8.GetBytes(jsonData);
+            byte[] encryptData = UtilityManager.Instance.AESEncrypt256(byteData, saltKey);
+            File.WriteAllBytes(path, encryptData);
+        }
+        else
+        {
+            File.WriteAllText(path, jsonData);
+        }
+    }
 }
 
 class AESEncrypt
@@ -47,7 +65,7 @@ class AESEncrypt
         aes.Padding = PaddingMode.PKCS7;
     }
 
-    // AES_256 암호화
+    // AES_256 Encryption
     public byte[] AESEncrypt256(byte[] encryptData, String password)
     {
         // Salt는 비밀번호의 길이를 SHA256 해쉬값으로 한다.
@@ -71,7 +89,7 @@ class AESEncrypt
         return xBuff;
     }
 
-    // AES_256 복호화
+    // AES_256 Decryption
     public byte[] AESDecrypt256(byte[] decryptData, String password)
     {
         // Salt는 비밀번호의 길이를 SHA256 해쉬값으로 한다.
