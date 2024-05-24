@@ -23,8 +23,8 @@ public class InfoplistOptionSetter
 
             // 기본 세팅
             SetOrUpdateKey(dict, "CFBundleDevelopmentRegion", "ko");
-            SetOrUpdateKey(dict, "CFBundleDisplayName", "세종은 처음이지?");
-            SetOrUpdateKey(dict, "CFBundleIdentifier", "com.sejongapp.sj");
+            SetOrUpdateKey(dict, "CFBundleDisplayName", "SampleName");
+            SetOrUpdateKey(dict, "CFBundleIdentifier", "com.samplecompany.name");
             SetOrUpdateKey(dict, "CFBundleShortVersionString", "1.0");
             SetOrUpdateKey(dict, "CFBundleVersion", "1");
 
@@ -108,7 +108,7 @@ public class InfoplistOptionSetter
         XElement domainDict = new XElement("dict");
         domainDict.Add(new XElement("key", "NSExceptionAllowsInsecureHTTPLoads"));
         domainDict.Add(new XElement("true"));
-        exceptionDomains.Add(new XElement("key", "119.65.154.110"));
+        exceptionDomains.Add(new XElement("key", "192.168.0.1")); // 허용 IP
         exceptionDomains.Add(domainDict);
 
         atsDict.Add(new XElement("key", "NSExceptionDomains"));
