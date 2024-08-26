@@ -21,7 +21,7 @@ private float ArrangeRotationValue(float value)
 /// </summary>
 private float AdjustAngle(float angle, float roundAngle)
 {
-    int meta = Mathf.FloorToInt(angle / roundAngle) + (angle > 0 ? 1 : -1);
+    int meta = Mathf.FloorToInt(angle / roundAngle) + (angle > 0 ? 1 : 0);
     meta = Mathf.FloorToInt(meta / 2);
     return Mathf.Round(meta * (roundAngle * 2));
 }
