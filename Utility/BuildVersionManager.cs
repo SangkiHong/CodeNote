@@ -59,7 +59,26 @@ public class BuildVersionManager
         string[] lines = PlayerSettings.bundleVersion.Split('.');
         EditVersion(0, 1, -int.Parse(lines[2]));
     }
-  
+
+    [InitializeOnLoadMethod]
+    static void CheckVersionLength()
+    {
+        string[] lines = PlayerSettings.bundleVersion.Split('.');
+        if (lines.Length < 3)
+        {
+            int MajorVersion = 0;
+            int MinorVersion = 0;
+            int Build = 0;
+
+            PlayerSettings.bundleVersion = MajorVersion.ToString("0") + "." +
+                                           MinorVersion.ToString("0") + "." +
+                                           Build.ToString("0");
+            PlayerSettings.Android.bundleVersionCode =
+                MajorVersion * 10000 + MinorVersion * 1000 + Build;
+        }
+    }
+
+
     private static void IncreaseBuild()
     {
         EditVersion(0, 0, 1);
