@@ -8,7 +8,7 @@ public class BuildVersionManager
     private static bool AutoIncrease = true;
     private const string AutoIncreaseMenuName = "Build/Auto Increase Build Version";
     
-    static VersionManager()
+    static BuildVersionManager()
     {
         AutoIncrease = EditorPrefs.GetBool(AutoIncreaseMenuName, true);
     }
